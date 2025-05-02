@@ -275,11 +275,17 @@ docker rm mynodejs
 
 
 Adaugam un ultim Build step si un Execute shell pentru face login in Docker Hub si pentru a seta tag-urile imaginii construite de Jenkins. Cu ajutorul tagurilor setate correct, vom putea face push la imaginea creata in Docker Hub. Jenkins server are un set de variabile predefinite, printre care si BUILD_NUMBER , pe care il vom folosi pentru a face tag-ul imaginii docker :
+
 docker login -u $DOCKER_USER -p $DOCKER_PASSWORD docker.io 
+
 docker tag mynodejs:1.0.0 bogdan1980b/mynodejs:latest
+
 docker push bogdan1980b/mynodejs:latest
+
 docker tag mynodejs:1.0.0 bogdan1980b/mynodejs:${BUILD_NUMBER}
+
 docker push bogdan1980b/mynodejs:${BUILD_NUMBER}
+
 Inlocuiti userul bogdan1980b din comenzi cu userul personal de DockerHub.
  
 
