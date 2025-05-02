@@ -48,47 +48,58 @@ Vom automatiza procesul de build si deploy a imaginilor docker. Buildul se va fa
 Instalare Jenkins intr-o masina virtuala care ruleaza Rocky Linux 9
 
 Confirmați că system repositories funcționează (dupa pornirea masinii virtuale, la prima executare a comenzii sudo, o sa va ceara parola userului. In cazul meu, userul este student, la voi poate fi diferit):
+
 sudo dnf repolist
  
 
 Pasul 1: Instalați OpenJDK 21 pe Rocky Linux 9
 Listați versiunile disponibile ale JDK pe Rocky Linux 9:
+
 sudo dnf search java-*-openjdk
  
 O să instalăm pachetul java-21-openjdk:
+
 sudo dnf -y install java-21-openjdk
  
 La finalul instalarii o sa vedem mesajul Complete! Si cateva detalii despre pachetele instalate, java si dependintele necesare:
  
 
 Verificam versiunea de java instalata default pe masina noastra virtuala:
+
 java -version
  
 Pasul 2: Adăugați repository-ul Jenkins la Rocky Linux
 Echipa Jenkins menține un repository cu pachete RPM pentru Jenkins. Vom adăuga acest repository, apoi vom instala pachete din el.
 Utilizați comanda wget pentru a descărca fișierul jenkins.repo și plasați-l în directorul corect:
+
 sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
  
 De asemenea, importați cheia GPG folosită pentru a semna pachetele Jenkins:
+
 sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
  
 Verificam daca repository-ul Jenkins este disponibil local:
+
 sudo dnf repolist
  
 Putem vedea pe ultima linie, coloana intai, repo id numit “jenkins”.
 
 Step 3: Install Jenkins Server on Rocky Linux 9
 Comanda de instalare a lui Jenkins:
+
 sudo dnf -y install jenkins
  
 
 Porniți serviciul Jenkins pe Rocky Linux 9 (dupa ce rulati comanda de start, asteptati in jur de 1 minut ca Jenkins sa porneasca):
+
 sudo systemctl start jenkins
  
 Trebuie sa configuram Jenkins sa porneasca odata cu masina virtuala (system boot):
+
 sudo systemctl enable jenkins
  
 Verificam daca Jenkins intr-adevar ruleaza pe masina noastra virtuala:
+
 sudo systemctl status jenkins
  
 Putem observa cuvintele de culoare verde: active (running). Asta ne spune ca Jenkins este pornit. Daca din anumite motive nu va porni, o sa vedeti un mesaj de culoarea rosie care va incepe probabil cu cuvantul “fail” sau “failed”.
@@ -99,6 +110,7 @@ http://localhost:8080
 Ar trebui să vedeti o pagină de bun venit și instructiuni despre cum să obțineți parola inițială de administrator:
  
 Ca sa vedem parola initiala, trebuie sa efectuam comanda cat pe fisierul /var/lib/jenkins/secrets/initialAdminPassword (Parola initiala e diferita la fiecare instalare, cand instalati voi, o sa aveti o alta parola initiala):
+
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
  
 Copy si paste la parola in pagina Jenkins in casuta Administrator Password si apoi apasati butonul Continue:
@@ -131,15 +143,20 @@ Apoi adaugati “mynodejs” la Repository Name si apasati Create, la fel ca in 
 Pasi necesari pentru a pregati Jenkins pentru a face push sau upload imaginii careia ii vom face build
 
 Login as root:
+
 sudo su -
  
 Avem nevoie sa aflam id-ul userului Jenkins cu comanda:
+
 id jenkins
  
 Notam numarul “uid=981” al userului jenkins, avem nevoie sa il folosim la urmatoarea comanda. In cazul nostru, este 981. In cazul vostru, e posibil sa fie alt numar, depinde de ce aplicatii s-au mai instalat pe aceasta instanta de linux sau ce useri ati create sau au create aceste aplicatii instalate.
 Rulam comenzile urmatoare pentru ca userul Jenkins sa aiba destule permisiuni pentru a face build unei imagini de docker (podman).
+
 loginctl enable-linger 981    (inlocuiti 981 cu uid al lui Jenkins instalat la voi pe calculator)
+
 echo jenkins:10000:65536 >> /etc/subuid
+
 echo jenkins:10000:65536 >> /etc/subgid
  
 
@@ -185,22 +202,33 @@ Apoi adaugam variabilele ca in poza de mai jos – Username Variable: DOCKER_USE
 La pasul Build Steps selectam Add build step si apoi Execute Shell
  
 Apoi adaugam in fereastra comanda de build: 
+
 podman build -t mynodejs:1.0.0 .
   
 Mai adaugam inca un Build step si apoi Execute Shell si adaugam comenzile pentru a porni si testa imaginea careia i-am facut build la pasul anterior
+
 podman run --name mynodejs -d -p 8081:8080 -it mynodejs:1.0.0
+
 sleep 10
+
 curl localhost:8081/nodejs
 
 Adaugam inca un Build step si inca un Execute shell unde rulam comenzile de stop al containerului mynodejs si apoi comanda de delete a containerului mynodejs
+
 podman stop mynodejs
+
 podman rm mynodejs
 
 Adaugam un ultim Build step si un Execute shell pentru face login in Docker Hub si pentru a seta tag-urile imaginii construite de Jenkins. Cu ajutorul tagurilor setate correct, vom putea face push la imaginea creata in Docker Hub. Jenkins server are un set de variabile predefinite, printre care si BUILD_NUMBER , pe care il vom folosi pentru a face tag-ul imaginii docker :
+
 podman login -u $DOCKER_USER -p $DOCKER_PASSWORD docker.io 
+
 podman tag mynodejs:1.0.0 bogdan1980b/mynodejs:latest
+
 podman push bogdan1980b/mynodejs:latest
+
 podman tag mynodejs:1.0.0 bogdan1980b/mynodejs:${BUILD_NUMBER}
+
 podman push bogdan1980b/mynodejs:${BUILD_NUMBER}
 
 Inlocuiti userul bogdan1980b din comenzi cu userul personal de DockerHub.
