@@ -6,8 +6,7 @@ require('dotenv').config();
 var rest_api_ip   = process.env.OPENLIBERTY_APP_SERVICE_HOST || process.env.LIBERTY_APP_SERVICE_HOST || process.env.LIBERTY_TEKTON_SERVICE_HOST || 'liberty-app';
 var rest_api_port = process.env.OPENLIBERTY_APP_SERVICE_PORT || process.env.LIBERTY_APP_SERVICE_PORT || process.env.LIBERTY_TEKTON_SERVICE_PORT || '9080';
 
-const AUTHORS_API_KEY = process.env.AUTHORS_API_KEY || 'none' ;
-
+const AUTHORS_API_KEY = process.env.AUTHORS_API_KEY || 'none';
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -56,7 +55,18 @@ router.post('/get_links', async function (req,res) {
       console.log(err);
       res.render('index', {links: null, error_authors: 'Error: Unable to invoke OpenLiberty Authors API.'});
     }
-  
+});
+
+/* GET /nodejs route (CI/CD status check). */
+router.get('/nodejs', function(req, res, next) {
+  res.json({
+    app: 'NodeJS UVT CI/CD App',
+    status: 'running',
+    timestamp: new Date().toISOString(),
+    jenkins_build: process.env.BUILD_NUMBER || 'N/A',
+    note: '🐳 Built and deployed via CI/CD pipeline',
+    hello_from: ['Ioana', 'Heran', 'Yousef', 'Ivan']
+  });
 });
 
 module.exports = router;
