@@ -202,3 +202,4 @@ Daca toti pasii au fost efectuati correct, o sa vedem ca job-ul nostru a fost fi
 In caz ca apar erori, putem accesa Output-ul consolei job-ului unde vom putea vedea logurile. Trebuie doar sa selectam job-ul din stanga jos  si apoi Console Output
 Daca totul este ok si job-ul s-a finalizat fara erori, ar trebui sa puteti gasi imaginea in DockerHub.
 Verificati in contul vostru de DockerHub ca aveti ultima versiune de imagine.
+# trigger rebuild
