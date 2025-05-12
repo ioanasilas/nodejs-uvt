@@ -203,3 +203,5 @@ In caz ca apar erori, putem accesa Output-ul consolei job-ului unde vom putea ve
 Daca totul este ok si job-ul s-a finalizat fara erori, ar trebui sa puteti gasi imaginea in DockerHub.
 Verificati in contul vostru de DockerHub ca aveti ultima versiune de imagine.
 # trigger rebuild
+# trigger rebuild
+ 
