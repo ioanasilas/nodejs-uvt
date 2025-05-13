@@ -190,3 +190,4 @@ In case of errors, we can access the job's console output where we can see the l
 
 If everything is ok and the job completed without errors, you should be able to find the image in DockerHub. 
 Check your DockerHub account to make sure you have the latest version of the image.
+trigger rebuild
